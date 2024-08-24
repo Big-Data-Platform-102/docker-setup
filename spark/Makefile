@@ -1,5 +1,5 @@
 network:
-	docker create network custom-network
+	docker network create custom-network
 
 build:
 	docker compose -f docker-compose.yml build
