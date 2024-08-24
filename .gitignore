@@ -1,0 +1,5 @@
+spark/notebook/.ipynb_checkpoints/*
+spark/notebook/spark-warehouse/*
+hive/warehouse/*
+hive/hive-db/*
+hive/.env
