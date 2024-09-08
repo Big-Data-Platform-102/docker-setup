@@ -3,3 +3,4 @@ spark/notebook/spark-warehouse/*
 hive/warehouse/*
 hive/hive-db/*
 hive/.env
+hive/jars/*

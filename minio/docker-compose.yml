@@ -1,5 +1,7 @@
 services:
   minio:
+    hostname: minio
+    container_name: minio
     image: 'bitnami/minio:latest'
     ports:
       - '9000:9000'
