@@ -64,11 +64,44 @@ services:
       CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
       CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
       CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components/,/etc/kafka-connect/jars
+      AWS_ACCESS_KEY_ID: dp-root-user
+      AWS_SECRET_ACCESS_KEY: dp-root-password
+    command:
+    - bash
+    - -c
+    - "
+        echo \"Installing connector plugins\"\n 
+        mkdir -p /usr/share/confluent-hub-components/\n 
+        confluent-hub install --no-prompt --component-dir /usr/share/confluent-hub-components/ tabular/iceberg-kafka-connect:0.6.5\n
+        #\n
+        echo \"Launching Kafka Connect worker\"\n
+        /etc/confluent/docker/run & \n#\nsleep infinity\n
+      "
     volumes: 
       - ./plugins:/etc/kafka-connect/jars
+    networks:
+      - custom-network
+
+  rest:
+    image: tabulario/iceberg-rest
+    container_name: iceberg-rest
+    ports:
+      - 8181:8181
+    environment:
+      AWS_ACCESS_KEY_ID: dp-root-user
+      AWS_SECRET_ACCESS_KEY: dp-root-password
+      AWS_REGION: us-east-1
+      CATALOG_WAREHOUSE: s3a://warehouse/test/
+      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT: http://minio:9000
+      CATALOG_S3_PATH__STYLE__ACCESS: true
     networks:
       - custom-network
 
