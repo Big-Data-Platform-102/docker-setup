@@ -1,24 +1,20 @@
 services:
   spark-master:
+    image: bdp-102/spark-node
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-master
     container_name: spark-master
+    env_file:
+      - ./common.env
     environment:
       - SPARK_MODE=master
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - AWS_REGION=us-west-2
-      - AWS_ACCESS_KEY_ID=dp-root-user
-      - AWS_SECRET_ACCESS_KEY=dp-root-password
     user: root
     ports:
-      - '8080:8080'
-      - '7077:7077'
-      - '4040:4040'
+      - 8080:8080
+      - 7077:7077
+      - 4040:4040
     volumes:
       - ./scripts:/opt/bitnami/spark/scripts
       - ./warehouse:/opt/bitnami/spark/warehouse
@@ -32,27 +28,23 @@ services:
       - custom-network
 
   spark-worker1:
+    image: bdp-102/spark-node
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-worker-1
     container_name: spark-worker-1
+    env_file:
+      - ./common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - AWS_REGION=us-west-2
-      - AWS_ACCESS_KEY_ID=dp-root-user
-      - AWS_SECRET_ACCESS_KEY=dp-root-password
     user: root
     ports:
-      - '8082:8080'
-      - '4041:4040'
+      - 8082:8080
+      - 4041:4040
     depends_on:
       spark-master:
         condition: service_healthy
@@ -60,27 +52,23 @@ services:
       - custom-network
 
   spark-worker2:
+    image: bdp-102/spark-node
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-worker-2
     container_name: spark-worker-2
+    env_file:
+      - ./common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=2G
       - SPARK_WORKER_CORES=2
-      - SPARK_RPC_AUTHENTICATION_ENABLED=no
-      - SPARK_RPC_ENCRYPTION_ENABLED=no
-      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-      - SPARK_SSL_ENABLED=no
-      - AWS_REGION=us-west-2
-      - AWS_ACCESS_KEY_ID=dp-root-user
-      - AWS_SECRET_ACCESS_KEY=dp-root-password
     user: root
     ports:
-      - '8084:8080'
-      - '4042:4040'
+      - 8084:8080
+      - 4042:4040
     depends_on:
       spark-master:
         condition: service_healthy
@@ -97,7 +85,7 @@ services:
       - AWS_ACCESS_KEY_ID=dp-root-user
       - AWS_SECRET_ACCESS_KEY=dp-root-password
     ports:
-      - '8888:8888'
+      - 8888:8888
     volumes:
       - ./notebook:/home/jovyan/work
     depends_on:

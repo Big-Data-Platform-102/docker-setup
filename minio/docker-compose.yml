@@ -1,11 +1,11 @@
 services:
   minio:
+    image: bitnami/minio:latest
     hostname: minio
     container_name: minio
-    image: 'bitnami/minio:latest'
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - 9000:9000
+      - 9001:9001
     environment:
       - MINIO_ROOT_USER=dp-root-user
       - MINIO_ROOT_PASSWORD=dp-root-password
