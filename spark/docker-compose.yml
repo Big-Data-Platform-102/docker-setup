@@ -1,13 +1,13 @@
 services:
   spark-master:
-    image: bdp-102/spark-node
+    image: bdp-102/spark-node:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-master
     container_name: spark-master
     env_file:
-      - ./common.env
+      - .common.env
     environment:
       - SPARK_MODE=master
     user: root
@@ -28,14 +28,14 @@ services:
       - custom-network
 
   spark-worker1:
-    image: bdp-102/spark-node
+    image: bdp-102/spark-node:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-worker-1
     container_name: spark-worker-1
     env_file:
-      - ./common.env
+      - .common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
@@ -52,14 +52,14 @@ services:
       - custom-network
 
   spark-worker2:
-    image: bdp-102/spark-node
+    image: bdp-102/spark-node:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     hostname: spark-worker-2
     container_name: spark-worker-2
     env_file:
-      - ./common.env
+      - .common.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
