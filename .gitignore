@@ -5,3 +5,4 @@ hive/hive-db/
 hive/.env
 hive/jars/
 kafka/plugins/
+postgres/pgdata/
