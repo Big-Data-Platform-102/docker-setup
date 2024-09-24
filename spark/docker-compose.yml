@@ -59,7 +59,7 @@ services:
     hostname: spark-worker-2
     container_name: spark-worker-2
     env_file:
-      - .common.env
+      - .spark.env
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077

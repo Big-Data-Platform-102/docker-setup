@@ -1,3 +1,5 @@
+**DEPRECATED**
+
 # Hive service 
 ## Start the service for the first time
 NOTE: If you already create the network while starting an another service, you can skip the second step

@@ -1,48 +1,33 @@
 services: 
   kafka-broker:
-    image: confluentinc/cp-server:7.5.0
+    image: bdp-102/kafka-broker
+    build:
+      context: .
+      dockerfile: ./docker/kafka-broker.Dockerfile
     hostname: broker
     container_name: broker
     ports:
       - 9092:9092
       - 29093:29093 
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CLUSTER_LINK_METADATA_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_CLUSTER_LINK_METADATA_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_DURABILITY_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_TIER_METADATA_REPLICATION_FACTOR: 1
-      KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
-      KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    env_file:
+      - .broker.env
     networks:
       - custom-network
 
 
   kafka-schema-registry:
-    image: confluentinc/cp-schema-registry:7.5.0
+    image: bdp-102/kafka-registry
+    build:
+      context: .
+      dockerfile: ./docker/kafka-registry.Dockerfile
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
       - kafka-broker
     ports:
       - 8081:8081
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
-      SCHEMA_REGISTRY_LISTENERS: schema-registry:8081
+    env_file:
+      - .registry.env
     networks:
       - custom-network
 
@@ -59,41 +44,23 @@ services:
       - kafka-schema-registry
     ports:
       - 8083:8083
-    environment:
-      CONNECT_BOOTSTRAP_SERVERS: broker:29092
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect
-      CONNECT_GROUP_ID: compose-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components/,/etc/kafka-connect/jars
-      AWS_ACCESS_KEY_ID: dp-root-user
-      AWS_SECRET_ACCESS_KEY: dp-root-password
+    env_file:
+      - .connect.env
     volumes: 
       - ./plugins:/etc/kafka-connect/jars
     networks:
       - custom-network
 
   rest:
-    image: tabulario/iceberg-rest
+    image: bdp-102/iceberg-rest
+    build:
+      context: .
+      dockerfile: ./docker/iceberg-rest.Dockerfile
     container_name: iceberg-rest
     ports:
       - 8181:8181
-    environment:
-      AWS_ACCESS_KEY_ID: dp-root-user
-      AWS_SECRET_ACCESS_KEY: dp-root-password
-      AWS_REGION: us-east-1
-      CATALOG_WAREHOUSE: s3a://warehouse/test/
-      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
-      CATALOG_S3_ENDPOINT: http://minio:9000
-      CATALOG_S3_PATH__STYLE__ACCESS: true
+    env_file:
+      - .iceberg-rest.env
     networks:
       - custom-network
 
