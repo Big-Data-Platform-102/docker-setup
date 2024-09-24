@@ -1,13 +1,16 @@
 services:
   minio:
-    image: bitnami/minio:latest
+    image: bdp-102/minio:latest
+    build:
+      context: .
+      dockerfile: ./docker/minio.Dockerfile
     hostname: minio
     container_name: minio
     ports:
       - 9000:9000
       - 9001:9001
     env_file:
-      - minio.env
+      - .minio.env
     volumes:
       - minio-single-node:/bitnami/minio/data
     networks:

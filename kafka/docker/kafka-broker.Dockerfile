@@ -1,0 +1,1 @@
+FROM confluentinc/cp-server:7.5.0
